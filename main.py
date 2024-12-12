@@ -1,5 +1,5 @@
 from fastapi import FastAPI,Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse,Response
 from textblob import TextBlob
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -57,4 +57,4 @@ async def whatsapp_webhook(request: Request):
         f"Subjectivity: {subjectivity:.2f}"
     )
 
-    return str(response)
+    return Response(content=str(response), media_type="application/xml")
