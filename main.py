@@ -35,29 +35,38 @@ def sentiment_analysis(text:str):
 
 @app.post("/webhook")
 async def whatsapp_webhook(request: Request):
-    form_data = await request.form()
-    incoming_msg = form_data.get("Body")  # User's WhatsApp message
+    try:
+        form_data = await request.form()
+        logging.info(f"Form data received: {form_data}")  # Log form data for debugging
+        incoming_msg = form_data.get("Body")  # User's WhatsApp message
 
-    # Perform sentiment analysis
-    blob = TextBlob(incoming_msg)
-    polarity = blob.sentiment.polarity
-    subjectivity = blob.sentiment.subjectivity
+        if not incoming_msg:
+            return Response(content="<Response><Message>No message received.</Message></Response>", media_type="application/xml")
 
-    if polarity > 0:
-        sentiment = "positive"
-    elif polarity < 0:
-        sentiment = "negative"
-    else:
-        sentiment = "neutral"
+        # Perform sentiment analysis
+        blob = TextBlob(incoming_msg)
+        polarity = blob.sentiment.polarity
+        subjectivity = blob.sentiment.subjectivity
 
-    # Create a response for WhatsApp
-    response = MessagingResponse()
-    response.message(
-        f"Sentiment Analysis Result:\n"
-        f"Text: {incoming_msg}\n"
-        f"Sentiment: {sentiment}\n"
-        f"Polarity: {polarity:.2f}\n"
-        f"Subjectivity: {subjectivity:.2f}"
-    )
+        if polarity > 0:
+            sentiment = "positive"
+        elif polarity < 0:
+            sentiment = "negative"
+        else:
+            sentiment = "neutral"
 
-    return Response(content=str(response), media_type="application/xml")
+        # Create a response for WhatsApp
+        response = MessagingResponse()
+        response.message(
+            f"Sentiment Analysis Result:\n"
+            f"Text: {incoming_msg}\n"
+            f"Sentiment: {sentiment}\n"
+            f"Polarity: {polarity:.2f}\n"
+            f"Subjectivity: {subjectivity:.2f}"
+        )
+
+        return Response(content=str(response), media_type="application/xml")
+
+    except Exception as e:
+        logging.error(f"Error processing webhook: {str(e)}")
+        return Response(content=f"<Response><Message>Error: {str(e)}</Message></Response>", media_type="application/xml")

@@ -2,3 +2,4 @@ textblob
 fastapi
 uvicorn
 twilio
+logging
