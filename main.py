@@ -2,6 +2,9 @@ from fastapi import FastAPI,Request
 from fastapi.responses import RedirectResponse,Response
 from textblob import TextBlob
 from twilio.twiml.messaging_response import MessagingResponse
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app=FastAPI(title="Sentiment Analysis App")
 
